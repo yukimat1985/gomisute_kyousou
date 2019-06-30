@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <title>ごみ捨て競争</title>
+</head>
+<body>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.js'></script>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.css' />  
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js'></script> 
+    
+    <div id="app">
+        <img src="gomibako.png" alt="gomibako" id="gomibako" width="150px">
+        <img src="ball.png" alt="ball" id="ball" width="80px" onload="image_arrangement(id)">
+        <img src="gorintou.png" alt="gorintou" id="gorintou" width="80px" onload="image_arrangement(id)">
+        <img src="yorozuya.png" alt="yorozuya" id="yorozuya" width="80px" onload="image_arrangement(id)">
+        <img src="zaru.png" alt="zaru" id="zaru" width="80px" onload="image_arrangement(id)">
+        <img src="pants.png" alt="pants" id="pants" width="80px" onload="image_arrangement(id)">
+    </div>
+    <div id="time">
+        <form name="myForm">
+            <input type="text" size="15" name="myFormTime">
+        </form>
+    </div>
+    
+    <script>
+        //imgランダム配置
+        function image_arrangement(id){
+            let img = document.getElementById(id);
+            img.style.position = "absolute";
+            img.style.cursor = "pointer";
+            img.style.left = Math.floor( Math.random() * 11 ) * 50 + 'px';
+            //img.style.right = Math.floor( Math.random() * 11 ) * 100 + 'px';
+            img.style.top  = Math.floor( Math.random() * 11 ) * 50 + 'px';
+        }
+
+        //ゴミ箱
+        var gomibako = document.getElementById("gomibako");
+        gomibako.style.zIndex = "1";
+        //ボール
+        var ball = document.getElementById("ball");
+        ball.style.zIndex = "2";       
+        //五輪塔
+        var gorintou = document.getElementById("gorintou");
+        gorintou.style.zIndex = "3";
+        //よろずや
+        var yorozuya = document.getElementById("yorozuya");
+        yorozuya.style.zIndex = "4";
+        //ざる
+        var zaru = document.getElementById("zaru");
+        zaru.style.zIndex = "5";
+        //パンツ
+        var pants = document.getElementById("pants");
+        pants.style.zIndex = "6";
+        //timer
+        var timer;
+        //count
+        var count = 0;
+
+        var dragstart = function(event){
+            return false;
+        }
+        var mousedown = function(event){
+            document.addEventListener("mousemove", startTimer);
+            document.addEventListener("mousemove", onmousemove);
+        }
+        var mouseup = function(event){
+            var eventId = document.getElementById(event.target.id);
+            var x = event.clientX;
+            var y = event.clientY;
+            var width = eventId.offsetWidth;
+            var height = eventId.offsetHeight;
+            var gomibakoRect = gomibako.getBoundingClientRect();
+            if((x >= gomibakoRect.left && x <= (gomibakoRect.left + gomibakoRect.width)) && (y >= gomibakoRect.top && y <= (gomibakoRect.top + gomibakoRect.height))){
+                var app = document.getElementById("app");
+                app.removeChild(eventId);
+                count = count + 1;
+                stopTimer(count);
+            }
+            document.removeEventListener("mousemove", startTimer);
+            document.removeEventListener("mousemove", onmousemove);
+        }
+        function onmousemove(event){
+            var eventId = document.getElementById(event.target.id);
+            var x = event.clientX;
+            var y = event.clientY;
+            var width = eventId.offsetWidth;
+            var height = eventId.offsetHeight;
+            eventId.style.top = (y - height/2) + "px";
+            eventId.style.left = (x - width/2) + "px";
+            var gomibakoRect = gomibako.getBoundingClientRect();
+            if((x >= gomibakoRect.left && x <= (gomibakoRect.left+gomibakoRect.width)) && (y >= gomibakoRect.top && y <= (gomibakoRect.top+gomibakoRect.height))){
+                gomibako.style.backgroundColor = "pink";
+            }else{
+                gomibako.style.backgroundColor = "white";
+            }
+        }
+        
+        function startTimer(event){
+            var time = document.myForm.myFormTime.value;
+            if(time == ""){
+                var startTime = new Date();
+                timer = setInterval(function(){ myDisp(startTime); }, 1);
+            }
+        }
+        function myDisp(myStart){
+            var myStop = new Date();
+            var myTime = myStop.getTime() - myStart.getTime();
+            var myH = Math.floor(myTime/(60*60*1000));
+            var myTime = myTime-(myH*60*60*1000);
+            var myM = Math.floor(myTime/(60*1000));
+            var myTime = myTime-(myM*60*1000);
+            var myS = Math.floor(myTime/1000);
+            var myMS = myTime%1000;
+            document.myForm.myFormTime.value = myH+":"+myM+":"+myS+":"+myMS;
+        }
+        function stopTimer(){
+            if(count == 5){
+                clearInterval(timer);
+            }
+        }
+
+        $(ball).on('dragstart',{ball},dragstart);
+        $(ball).on('mousedown',{ball},mousedown);
+        $(ball).on('mouseup',{ball},mouseup);
+        $(gorintou).on('dragstart',{gorintou},dragstart);
+        $(gorintou).on('mousedown',{gorintou},mousedown);
+        $(gorintou).on('mouseup',{gorintou},mouseup);
+        $(yorozuya).on('dragstart',{yorozuya},dragstart);
+        $(yorozuya).on('mousedown',{yorozuya},mousedown);
+        $(yorozuya).on('mouseup',{yorozuya},mouseup);
+        $(zaru).on('dragstart',{zaru},dragstart);
+        $(zaru).on('mousedown',{zaru},mousedown);
+        $(zaru).on('mouseup',{zaru},mouseup);
+        $(pants).on('dragstart',{pants},dragstart);
+        $(pants).on('mousedown',{pants},mousedown);
+        $(pants).on('mouseup',{pants},mouseup);
+        
+    </script>
+</body>
